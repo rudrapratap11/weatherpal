@@ -1,19 +1,19 @@
 /** @format */
 "use client";
 
-import Container from "../components/Container";
-import ForecastWeatherDetail from "../components/ForecastWeatherDetail";
-import Navbar from "@/components/Navbar";
-import WeatherDetails from "@/components/WeatherDetails";
-import WeatherIcon from "@/components/WeatherIcon";
-import { convertKelvinToCelsius } from "..utils/convertKelvinToCelsius";
-import { convertWindSpeed } from "../utils/convertWindSpeed";
-import { getDayOrNightIcon } from "../utils/getDayOrNightIcon";
-import { metersToKilometers } from "../utils/metersToKilometers";
+import Container from "../app/components/Container";
+import ForecastWeatherDetail from "../app/components/ForecastWeatherDetails";
+import Navbar from "../app/components/navbar";
+import WeatherDetails from "../app/components/WeatherDetails";
+import WeatherIcon from "../app/components/ForecastWeatherDetails";
+import { convertKelvinToCelsius } from "../app/utils/convertKelvinToCelsius";
+import { convertWindSpeed } from "../app/utils/convertWindSpeed";
+import { getDayOrNightIcon } from "../app/utils/getDayorNightIcon";
+import { metersToKilometers } from "../app/utils/metersToKilometers";
 import axios from "axios";
 import { format, fromUnixTime, parseISO } from "date-fns";
 import Image from "next/image";
-import { useQuery } from "react-query";
+import { useQuery } from '@tanstack/react-query';
 import { loadingCityAtom, placeAtom } from "./atom";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
@@ -80,15 +80,18 @@ export default function Home() {
   const [place, setPlace] = useAtom(placeAtom);
   const [loadingCity] = useAtom(loadingCityAtom);
 
-  const { isLoading, error, data, refetch } = useQuery<WeatherData>(
-    "repoData",
-    async () => {
+  const { isLoading, error, data, refetch } = useQuery<WeatherData>({
+    queryKey: ["repoData", place], // good practice to add dependent key like place
+    queryFn: async () => {
       const { data } = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=56`
       );
       return data;
-    }
-  );
+    },
+  });
+  
+  
+  
 
   useEffect(() => {
     refetch();
