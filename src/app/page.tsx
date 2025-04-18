@@ -30,7 +30,7 @@ interface WeatherDetail {
     temp_max: number;
     pressure: number;
     sea_level: number;
-    grnd_level: number;
+    grnd_level: number; 
     humidity: number;
     temp_kf: number;
   };
@@ -77,39 +77,39 @@ interface WeatherData {
 }
 
 export default function Home() {
-  const [place, setPlace] = useAtom(placeAtom);
-  const [loadingCity] = useAtom(loadingCityAtom);
+  const { isPending, isLoading, error, data, } = useQuery({
+    queryKey: ['repoData' , async () =>
+    {
+      const{data} = await axios.get('https://api.openweathermap.org/data/2.5/forecast?q=pune&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&');
+    return data;
+    }
+    ],
+    // queryFn: () =>
+    //   fetch(`https://api.openweathermap.org/data/2.5/forecast?q=$&appid=e04b6bda771d802ef02e77070124f7d7&cnt=56`).then((res) =>
+    //     res.json(),
+    //   ),
+  })
 
-  const { isLoading, error, data, refetch } = useQuery<WeatherData>({
-    queryKey: ["repoData", place], // good practice to add dependent key like place
-    queryFn: async () => {
-      const { data } = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=56`
-      );
-      return data;
-    },
-  });
-  
-  
-  
+  if (isPending) return 'Loading...'
 
-  useEffect(() => {
-    refetch();
-  }, [place, refetch]);
+  if (error) return 'An error has occurred: ' + error.message
 
-  const firstData = data?.list[0];
+  if (isPending) return 'Loading...'
+
+  if (error) return 'An error has occurred: '
+
+  const firstData = data?.list?.[0];
 
   // console.log("error", error);
 
   console.log("data", data);
 
-  const uniqueDates = [
-    ...new Set(
-      data?.list.map(
-        (entry) => new Date(entry.dt * 1000).toISOString().split("T")[0]
-      )
-    )
-  ];
+  const uniqueDates = data?.list
+  ? [...new Set(data.list.map((entry) =>
+      new Date(entry.dt * 1000).toISOString().split("T")[0]
+    ))]
+  : [];
+
 
   // Filtering data to get the first entry after 6 AM for each unique date
   const firstDataForEachDate = uniqueDates.map((date) => {
@@ -135,12 +135,10 @@ export default function Home() {
     );
   return (
     <div className="flex flex-col gap-4 bg-gray-100 min-h-screen ">
-      <Navbar location={data?.city.name} />
       <main className="px-3 max-w-7xl mx-auto flex flex-col gap-9  w-full  pb-10 pt-4 ">
         {/* today data  */}
-        {loadingCity ? (
           <WeatherSkeleton />
-        ) : (
+        : (
           <>
             <section className="space-y-4 ">
               <div className="space-y-2">
@@ -261,7 +259,7 @@ export default function Home() {
               ))}
             </section>
           </>
-        )}
+        )
       </main>
     </div>
   );
