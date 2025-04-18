@@ -2,13 +2,13 @@
 "use client";
 
 import Container from "../components/Container";
-import ForecastWeatherDetail from "../components/ForecastWeatherDetail";
-import Navbar from "@/components/Navbar";
-import WeatherDetails from "@/components/WeatherDetails";
-import WeatherIcon from "@/components/WeatherIcon";
-import { convertKelvinToCelsius } from "..utils/convertKelvinToCelsius";
+import ForecastWeatherDetail from "../components/ForecastWeatherDetails";
+import Navbar from "../components/navbar";
+import WeatherDetails from "../components/WeatherDetails";
+import WeatherIcon from "../components/WeatherIcon";
+import { convertKelvinToCelsius } from "../utils/convertKelvinToCelsius";
 import { convertWindSpeed } from "../utils/convertWindSpeed";
-import { getDayOrNightIcon } from "../utils/getDayOrNightIcon";
+import { getDayOrNightIcon } from "../utils/getDayorNightIcon";
 import { metersToKilometers } from "../utils/metersToKilometers";
 import axios from "axios";
 import { format, fromUnixTime, parseISO } from "date-fns";
